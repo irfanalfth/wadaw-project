@@ -55,7 +55,7 @@ class Usaha extends CI_Controller
 			'title' => 'Dashboard',
 			'data' => [
 				'total_penjualan' => $total_penjualan,
-				'total_pembelian' =>  $total_pembelian,
+				'total_pembelian' => $total_pembelian,
 				'total_penghasilan' => $total_penghasilan,
 
 				'produk_stok' => $this->db->select('produk.id, produk.nama, CEIL(SUM(pembelian_detail.jumlah * pembelian_detail.harga) / SUM(pembelian_detail.jumlah) / 100) * 100 as harga_beli, produk_stok.jumlah, produk.kode')

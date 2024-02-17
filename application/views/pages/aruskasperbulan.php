@@ -38,23 +38,63 @@ $dompet = [
 	<!-- Table -->
 	<div class="row">
 		<div class="col">
-			<div class="card mb-3">
-				<div class="card-body">
-					<form action="<?= base_url('keuangan/perbulaan'); ?>" method="post">
-						<div class="form-row align-items-center">
-							<div class="col">
-								<?php $tanggalSaatIni = date('Y-m');
+			<div class="row align-items-center">
+				<div class="col">
+					<div class="card py-2">
+						<div class="card-body">
+							<form action="<?= base_url('keuangan/perbulaan'); ?>" method="post">
+								<div class="form-row align-items-center">
+									<div class="col">
+										<?php $tanggalSaatIni = date('Y-m');
 
-								if (isset($_POST['tahunBulan'])) {
-									$tanggalSaatIni = htmlspecialchars($_POST['tahunBulan']);
-								} ?>
-								<input type="month" class="form-control" name="tahunBulan" id="tahunBulan" autocomplete="off" value="<?= $tanggalSaatIni;  ?>">
-							</div>
-							<div class="col-auto">
-								<button type="submit" class="btn btn-default btn-block">Simpan</button>
+										if (isset($_POST['tahunBulan'])) {
+											$tanggalSaatIni = htmlspecialchars($_POST['tahunBulan']);
+										} ?>
+										<input type="month" class="form-control" name="tahunBulan" id="tahunBulan" autocomplete="off" value="<?= $tanggalSaatIni;  ?>">
+									</div>
+									<div class="col-auto">
+										<button type="submit" class="btn btn-default btn-block">Simpan</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-3 col-md-12">
+					<div class="card card-stats">
+						<!-- Card body -->
+						<div class="card-body my-3">
+							<div class="row">
+								<div class="col">
+									<h5 class="card-title text-uppercase text-muted mb-0">Total Pemasukan</h5>
+									<span class="h1 font-weight-bold mb-0"><?= rupiah(count($kas) === 0 ? 0 : $kas['in']['total']); ?></span>
+								</div>
+								<div class="col-auto">
+									<div class="icon icon-shape bg-success text-white rounded-circle shadow">
+										<i class="fas fa-arrow-down"></i>
+									</div>
+								</div>
 							</div>
 						</div>
-					</form>
+					</div>
+				</div>
+				<div class="col-lg-3 col-md-12">
+					<div class="card card-stats">
+						<!-- Card body -->
+						<div class="card-body my-3">
+							<div class="row">
+								<div class="col">
+									<h5 class="card-title text-uppercase text-muted mb-0">Total Pengeluaran</h5>
+									<span class="h1 font-weight-bold mb-0"><?= rupiah(count($kas) === 0 ? 0 : $kas['out']['total']); ?></span>
+								</div>
+								<div class="col-auto">
+									<div class="icon icon-shape bg-red text-white rounded-circle shadow">
+										<i class="fas fa-arrow-up"></i>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 

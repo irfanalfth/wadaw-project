@@ -17,7 +17,7 @@
 			</div>
 			<!-- Card stats -->
 			<div class="row">
-				<div class="col-xl-4 col-md-6">
+				<div class="col-lg-4 col-md-12">
 					<div class="card card-stats">
 						<!-- Card body -->
 						<div class="card-body mt-3">
@@ -28,18 +28,18 @@
 								</div>
 								<div class="col-auto">
 									<div class="icon icon-shape bg-red text-white rounded-circle shadow">
-										<i class="ni ni-active-40"></i>
+										<i class="fas fa-arrow-up"></i>
 									</div>
 								</div>
 							</div>
 							<p class="mt-3 mb-0 text-sm">
-								<span class="text-red mr-2 font-weight-bold"><?= $data['total_pembelian']['produk_beli']; ?></span>
+								<span class="text-red mr-2 font-weight-bold"><?= $data['total_pembelian']['produk_beli'] === null ? 0 : $data['total_pembelian']['produk_beli']; ?></span>
 								<span class="text-nowrap font-weight-400">Produk Masuk Bulan Ini</span>
 							</p>
 						</div>
 					</div>
 				</div>
-				<div class="col-xl-4 col-md-6">
+				<div class="col-lg-4 col-md-12">
 					<div class="card card-stats">
 						<!-- Card body -->
 						<div class="card-body mt-3">
@@ -50,18 +50,18 @@
 								</div>
 								<div class="col-auto">
 									<div class="icon icon-shape bg-success text-white rounded-circle shadow">
-										<i class="ni ni-active-40"></i>
+										<i class="fas fa-arrow-down"></i>
 									</div>
 								</div>
 							</div>
 							<p class="mt-3 mb-0 text-sm">
-								<span class="text-success mr-2 font-weight-bold"><?= $data['total_penjualan']['produk_jual']; ?></span>
+								<span class="text-success mr-2 font-weight-bold"><?= $data['total_penjualan']['produk_jual'] === null ? 0 : $data['total_penjualan']['produk_jual']; ?></span>
 								<span class="text-nowrap font-weight-400">Produk Terjual Bulan Ini</span>
 							</p>
 						</div>
 					</div>
 				</div>
-				<div class="col-xl-4 col-md-6">
+				<div class="col-lg-4 col-md-12">
 					<div class="card card-stats">
 						<!-- Card body -->
 						<div class="card-body mt-3">
@@ -72,7 +72,7 @@
 								</div>
 								<div class="col-auto">
 									<div class="icon icon-shape bg-blue text-white rounded-circle shadow">
-										<i class="ni ni-active-40"></i>
+										<i class="fas fa-wallet"></i>
 									</div>
 								</div>
 							</div>
@@ -106,31 +106,37 @@
 									</tr>
 								</thead>
 								<tbody>
-									<?php foreach ($data['produk_stok'] as $key => $value) : ?>
-										<tr>
-											<td scope="row">
-												<div class="mb-0 font-weight-bold">
-													<?= $value['nama']; ?>
-												</div>
-												<span>
-													<?= strtoupper($value['kode']); ?>
-												</span>
-											</td>
-											<th class="text-primary">
-												<?= rupiah($value['harga_beli']); ?>
-											</th>
-											<td>
-												<?php if ($value['jumlah'] === "0") : ?>
-													<span class="badge badge-dot mr-4">
-														<i class="bg-red"></i>
-														<span>Stok Habis</span>
+									<?php if ($data['produk_stok']) : ?>
+										<?php foreach ($data['produk_stok'] as $key => $value) : ?>
+											<tr>
+												<td scope="row">
+													<div class="mb-0 font-weight-bold">
+														<?= $value['nama']; ?>
+													</div>
+													<span>
+														<?= strtoupper($value['kode']); ?>
 													</span>
-												<?php else : ?>
-													<?= $value['jumlah']; ?>
-												<?php endif ?>
-											</td>
+												</td>
+												<th class="text-primary">
+													<?= rupiah($value['harga_beli']); ?>
+												</th>
+												<td>
+													<?php if ($value['jumlah'] === "0") : ?>
+														<span class="badge badge-dot mr-4">
+															<i class="bg-red"></i>
+															<span>Stok Habis</span>
+														</span>
+													<?php else : ?>
+														<?= $value['jumlah']; ?>
+													<?php endif ?>
+												</td>
+											</tr>
+										<?php endforeach; ?>
+									<?php else : ?>
+										<tr>
+											<td colspan="1000" class="text-center">Tidak Ada Data</td>
 										</tr>
-									<?php endforeach; ?>
+									<?php endif ?>
 								</tbody>
 							</table>
 						</div>
@@ -155,17 +161,23 @@
 									</tr>
 								</thead>
 								<tbody>
-									<?php
-									foreach ($data['penjualan'] as $key => $row) : ?>
+									<?php if ($data['produk_stok']) : ?>
+										<?php
+										foreach ($data['penjualan'] as $key => $row) : ?>
+											<tr>
+												<td>
+													<?= date("d M Y", strtotime($row['tanggal'])); ?>
+												</td>
+												<td class="text-primary">
+													<?= rupiah($row['total_penjualan']); ?>
+												</td>
+											</tr>
+										<?php endforeach ?>
+									<?php else : ?>
 										<tr>
-											<td>
-												<?= date("d M Y", strtotime($row['tanggal'])); ?>
-											</td>
-											<td class="text-primary">
-												<?= rupiah($row['total_penjualan']); ?>
-											</td>
+											<td colspan="1000" class="text-center">Tidak Ada Data</td>
 										</tr>
-									<?php endforeach ?>
+									<?php endif ?>
 								</tbody>
 							</table>
 						</div>
@@ -190,17 +202,23 @@
 									</tr>
 								</thead>
 								<tbody>
-									<?php
-									foreach ($data['pembelian'] as $key => $row) : ?>
+									<?php if ($data['produk_stok']) : ?>
+										<?php
+										foreach ($data['pembelian'] as $key => $row) : ?>
+											<tr>
+												<td>
+													<?= date("d M Y", strtotime($row['tanggal_pembelian'])); ?>
+												</td>
+												<td class="text-primary">
+													<?= rupiah($row['total_pembelian']); ?>
+												</td>
+											</tr>
+										<?php endforeach ?>
+									<?php else : ?>
 										<tr>
-											<td>
-												<?= date("d M Y", strtotime($row['tanggal_pembelian'])); ?>
-											</td>
-											<td class="text-primary">
-												<?= rupiah($row['total_pembelian']); ?>
-											</td>
+											<td colspan="1000" class="text-center">Tidak Ada Data</td>
 										</tr>
-									<?php endforeach ?>
+									<?php endif ?>
 								</tbody>
 							</table>
 						</div>

@@ -40,15 +40,15 @@ $dompet = [
 		<div class="col">
 			<div class="card mb-3">
 				<div class="card-body">
-					<form id="add-kas">
+					<form class="ambil-tabungan">
 						<div class="form-row align-items-center">
-							<div class="col">
+							<div class="col-sm-12 col-md-6 col-lg-6 col-xl-5 my-2">
 								<input type="text" class="form-control" name="keterangan" id="keterangan" placeholder="Keterangan" autocomplete="off">
 							</div>
-							<div class="col">
+							<div class="col-sm-12 col-md-6 col-lg-6 col-xl-5 my-2">
 								<input type="text" class="form-control" name="jumlah" id="rupiahInput" placeholder="Jumlah" autocomplete="off">
 							</div>
-							<div class="col-auto">
+							<div class="col-sm-12 col-md-12 col-lg-12 col-xl-2 btn-block my-2">
 								<button type="submit" class="btn btn-default btn-block">Ambil Tabungan</button>
 							</div>
 						</div>
@@ -63,7 +63,6 @@ $dompet = [
 							<tr>
 								<th>tanggal</th>
 								<th>keterangan</th>
-								<th>kategori</th>
 								<th>jumlah</th>
 								<th></th>
 							</tr>
@@ -77,10 +76,8 @@ $dompet = [
 									<td class="align-middle mb-0 text-sm font-weight-600">
 										<?= $row['keterangan']; ?>
 									</td>
-									<td class="align-middle mb-0 text-sm font-weight-600">
-										<?= searchInArray($row['dompet'], $dompet); ?>
-									</td>
-									<td class="align-middle mb-0 text-sm font-weight-600 text-primary">
+									<td class="align-middle mb-0 text-sm font-weight-600 <?= $row['kategori'] === 'in' ? 'text-success' : 'text-red'; ?>">
+										<?= ($row['kategori'] === 'in' ? '+ ' : '- '); ?>
 										<?= rupiah($row['jumlah']); ?>
 									</td>
 									<td class="text-right">
@@ -136,4 +133,32 @@ $dompet = [
 		rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
 		return prefix == undefined ? rupiah : (rupiah ? 'Rp. ' + rupiah : '');
 	}
+
+	$('.ambil-tabungan').submit(function(e) {
+		e.preventDefault();
+
+		var formData = $(this).serialize();
+
+		$.ajax({
+			type: 'POST',
+			url: '<?= base_url('keuangan/ambilTabungan'); ?>',
+			data: formData,
+			success: function(response) {
+				let res = JSON.parse(response);
+
+				Swal.fire({
+					icon: 'success',
+					title: 'Success!',
+					text: `Berhasil ambil tabungan`,
+				}).then((result) => {
+					if (result.isConfirmed || result.isDismissed) {
+						location.reload();
+					}
+				});
+			},
+			error: function(xhr, status, error) {
+				console.error(xhr.responseText);
+			}
+		});
+	});
 </script>

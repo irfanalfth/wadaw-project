@@ -36,13 +36,28 @@ class Keuangan extends CI_Controller
 
 	public function dashboard()
 	{
-		$firstDayOfMonth = date('Y-m-01');
-		$lastDayOfMonth = date('Y-m-t');
+		$user = $this->db->get_where('users', ['username' => $this->session->userdata('username')])->row_array();
+
+		$result = $this->db->select('kategori, SUM(jumlah) as total')
+			->from('arus_kas')
+			->group_by('kategori')
+			->where('DATE(tanggal) >=', date('Y-m-01'))
+			->where('DATE(tanggal) <=', date('Y-m-t'))
+			->get()
+			->result_array();
+
+		$formattedResult = [];
+		foreach ($result as $row) {
+			$formattedResult[$row['kategori']] = $row;
+		}
 
 		$data = [
 			'pages' => 'dashboard',
 			'title' => 'Dashboard',
-			'data' => 0
+			'data' => [
+				'saldo' => $this->db->get_where('saldo', ['user_id' => $user['id']])->row_array(),
+				'arus_kas' => $formattedResult,
+			]
 		];
 
 		$this->load->view('layouts/main', $data);
@@ -55,6 +70,18 @@ class Keuangan extends CI_Controller
 		$firstDayOfMonth = $desiredMonth . '-01';
 		$lastDayOfMonth = date('Y-m-t', strtotime($firstDayOfMonth));
 
+		$result = $this->db->select('kategori, SUM(jumlah) as total')
+			->from('arus_kas')
+			->group_by('kategori')
+			->where("tanggal BETWEEN '$firstDayOfMonth' AND '$lastDayOfMonth'")
+			->get()
+			->result_array();
+
+		$formattedResult = [];
+		foreach ($result as $row) {
+			$formattedResult[$row['kategori']] = $row;
+		}
+
 		$data = [
 			'pages' => 'aruskasperbulan',
 			'title' => 'Arus Kas Perbulan',
@@ -62,7 +89,8 @@ class Keuangan extends CI_Controller
 				->from('arus_kas')
 				->where("tanggal BETWEEN '$firstDayOfMonth' AND '$lastDayOfMonth'")
 				->order_by('id', 'desc')
-				->get()->result_array()
+				->get()->result_array(),
+			'kas' => $formattedResult
 		];
 
 		$this->load->view('layouts/main', $data);
@@ -75,6 +103,18 @@ class Keuangan extends CI_Controller
 		$firstDayOfMonth = $desiredMonth . '-01';
 		$lastDayOfMonth = date('Y-m-t', strtotime($firstDayOfMonth));
 
+		$result = $this->db->select('kategori, SUM(jumlah) as total')
+			->from('arus_kas')
+			->group_by('kategori')
+			->where("tanggal BETWEEN '$firstDayOfMonth' AND '$lastDayOfMonth'")
+			->get()
+			->result_array();
+
+		$formattedResult = [];
+		foreach ($result as $row) {
+			$formattedResult[$row['kategori']] = $row;
+		}
+
 		$data = [
 			'pages' => 'aruskasperbulan',
 			'title' => 'Arus Kas Perbulan',
@@ -82,7 +122,8 @@ class Keuangan extends CI_Controller
 				->from('arus_kas')
 				->where("tanggal BETWEEN '$firstDayOfMonth' AND '$lastDayOfMonth'")
 				->order_by('id', 'desc')
-				->get()->result_array()
+				->get()->result_array(),
+			'kas' => $formattedResult
 		];
 
 		$this->load->view('layouts/main', $data);
@@ -111,8 +152,7 @@ class Keuangan extends CI_Controller
 			'pages' => 'tabungan',
 			'title' => 'Tabungan',
 			'data' => $this->db->select('*')
-				->from('arus_kas')
-				->where('kategori', 'save')
+				->from('tabungan')
 				->where('user_id', $user['id'])
 				->order_by('id', 'desc')
 				->get()->result_array()
@@ -290,6 +330,55 @@ class Keuangan extends CI_Controller
 			echo json_encode($data);
 		} else {
 			echo json_encode([]);
+		}
+	}
+
+	public function ambilTabungan()
+	{
+		$this->form_validation->set_rules('keterangan', 'Keterangan', 'required|trim');
+		$this->form_validation->set_rules('jumlah', 'Jumlah', 'required|trim');
+
+		if ($this->form_validation->run() == false) {
+			redirect('keuangan/tabungan');
+		} else {
+			$user = $this->db->get_where('users', ['username' => $this->session->userdata('username')])->row_array();
+			$saldo =  $this->db->get_where('saldo', ['user_id' => $user['id']])->row_array();
+
+			if ($this->input->is_ajax_request()) {
+				$data = $this->input->post();
+
+				$this->db->update('saldo', ['saldo_tabungan' => $saldo['saldo_tabungan'] - toNumber($data['jumlah'])], ['user_id' => $user['id']]);
+
+				$this->db->insert('arus_kas', [
+					'tanggal' => date('Y-m-d'),
+					'keterangan' => "Ambil Tabungan (" . $data['keterangan'] . ")",
+					'kategori' => "out",
+					'dompet' => '-',
+					'jumlah' => toNumber($data['jumlah']),
+					'user_id' => $user['id']
+				]);
+
+				$this->db->insert('tabungan', [
+					'tanggal' => date('Y-m-d'),
+					'keterangan' => "Ambil Tabungan (" . $data['keterangan'] . ")",
+					'kategori' => "out",
+					'jumlah' => toNumber($data['jumlah']),
+					'user_id' => $user['id'],
+					'kas_id' => $this->db->insert_id()
+				]);
+
+				echo json_encode([
+					'status'  => 200,
+					'message' => 'Success update kas',
+					'data'    => $data
+				]);
+			} else {
+				echo json_encode([
+					'status'  => 400,
+					'message' => 'Bad Request!!!',
+					'data'    => []
+				]);
+			}
 		}
 	}
 }

@@ -9,6 +9,7 @@ $dompet = [
 	'shopeepay' => 'ShopeePay'
 ];
 ?>
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
@@ -37,23 +38,22 @@ $dompet = [
 	<!-- Table -->
 	<div class="row">
 		<div class="col">
-			<div class="card mb-3">
+			<div class="card my-2">
 				<div class="card-body">
 					<form id="add-kas">
 						<div class="form-row align-items-center">
-							<div class="col">
+							<div class="col-sm-12 col-md-6 col-lg-3 my-2">
 								<input type="text" class="form-control" name="keterangan" id="keterangan" placeholder="Keterangan" autocomplete="off">
 							</div>
-							<div class="col">
+							<div class="col-sm-12 col-md-6 col-lg-2 my-2">
 								<select name="kategori" id="kategori" class="form-control">
 									<option value="" selected disabled>Kategori</option>
 									<option value="in">Masuk</option>
 									<option value="out">Keluar</option>
 									<option value="save">Tabungan</option>
-									<option value="need">Kebutuhan Rutin</option>
 								</select>
 							</div>
-							<div class="col">
+							<div class="col-sm-12 col-md-6 col-lg-2 my-2">
 								<select name="pembayaran" id="pembayaran" class="form-control">
 									<option value="" selected disabled>Dompet</option>
 									<?php foreach ($dompet as $key => $row) : ?>
@@ -61,10 +61,10 @@ $dompet = [
 									<?php endforeach; ?>
 								</select>
 							</div>
-							<div class="col">
+							<div class="col-sm-12 col-md-6 col-lg-3 my-2">
 								<input type="text" class="form-control" name="jumlah" id="rupiahInput" placeholder="Jumlah" autocomplete="off">
 							</div>
-							<div class="col-auto">
+							<div class="col-sm-auto col-md-12 col-lg-2 my-2 btn-block">
 								<button type="submit" class="btn btn-default btn-block">Simpan</button>
 							</div>
 						</div>
